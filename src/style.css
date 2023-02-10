@@ -14,3 +14,13 @@ body {
   width: 100vw;
   height: 100vh;
 }
+.analog{
+  position: absolute;
+  left: 0;
+  width: 50vw;
+  height: 100vh;
+  top: 0;
+  display: block;
+  z-index: 1;
+  touch-action: auto;
+}

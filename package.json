@@ -13,6 +13,7 @@
     "vite-plugin-glsl": "^1.1.2"
   },
   "dependencies": {
+    "nipplejs": "^0.10.0",
     "three": "^0.149.0"
   }
 }

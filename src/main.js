@@ -1,4 +1,5 @@
 import './style.css'
+import nipplejs from 'nipplejs';
 import * as THREE from 'three'
 
 
@@ -16,8 +17,25 @@ class FirstPersonControl {
     this.velocity = new THREE.Vector3();
     this.vector = new THREE.Vector3();
 
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      document.removeEventListener('keydown', () => { })
+      document.removeEventListener('keyup', () => { })
+      var manager = nipplejs.create({
+        zone: document.querySelector('.analog')
+      });
+      manager.on('added', (evt, nipple) => {
+        nipple.on('start move end dir plain', (evt) => {
+          this.velocity.z = nipple.frontPosition.y / 50
+          this.velocity.x = nipple.frontPosition.x / 50
+        });
+      }).on('removed', (evt, nipple) => {
+        this.velocity.z = 0
+        this.velocity.x = 0
+        nipple.off('start move end dir plain');
+      });
+    }
+
     this.domElement.addEventListener('click', this.requestPointerLock.bind(this));
-    document.addEventListener('pointerlockchange', this.onPointerLockChange.bind(this));
     document.addEventListener('mousemove', this.onMouseMove.bind(this));
     this.domElement.addEventListener('touchstart', this.onTouchStart.bind(this));
     this.domElement.addEventListener('touchmove', this.onTouchMove.bind(this));
@@ -57,15 +75,8 @@ class FirstPersonControl {
 
   requestPointerLock() {
     this.domElement.requestPointerLock();
-    this.domElement.requestFullscreen()
-  }
-
-  onPointerLockChange() {
-    if (document.pointerLockElement === this.domElement) {
-      this.enabled = true;
-    } else {
-      this.enabled = false;
-    }
+    document.body.requestFullscreen()
+    this.enabled = true;
   }
 
   onMouseMove(event) {
