@@ -14,6 +14,7 @@ class FirstPersonControl {
     this.yMaxLimit = 90;
     this.x = 0;
     this.y = 0;
+    this.active = 0
     this.velocity = new THREE.Vector3();
     this.vector = new THREE.Vector3();
 
@@ -21,7 +22,8 @@ class FirstPersonControl {
       document.removeEventListener('keydown', () => { })
       document.removeEventListener('keyup', () => { })
       var manager = nipplejs.create({
-        zone: document.querySelector('.analog')
+        zone: document.querySelector('.analog'),
+        multitouch: true
       });
       manager.on('added', (evt, nipple) => {
         nipple.on('start move end dir plain', (evt) => {
@@ -87,19 +89,22 @@ class FirstPersonControl {
   }
 
   onTouchStart(event) {
-    this.startX = event.touches[0].clientX;
-    this.startY = event.touches[0].clientY;
+    this.startX = event.touches[this.active].clientX;
+    this.startY = event.touches[this.active].clientY;
   }
 
   onTouchMove(event) {
     if (!this.enabled) return;
     const screenWidth = window.innerWidth;
-    if (event.touches[0].clientX > screenWidth / 2) {
-      this.x += (event.touches[0].clientX - this.startX) * this.xSpeed;
-      this.y -= (event.touches[0].clientY - this.startY) * this.ySpeed;
-      this.y = Math.max(Math.min(this.y, this.yMaxLimit), this.yMinLimit);
-      this.startX = event.touches[0].clientX;
-      this.startY = event.touches[0].clientY;
+    for (let i = 0; i < 2; i++) {
+      if (event.touches[i].clientX > screenWidth / 2) {
+        this.active = i
+        this.x += (event.touches[i].clientX - this.startX) * this.xSpeed;
+        this.y -= (event.touches[i].clientY - this.startY) * this.ySpeed;
+        this.y = Math.max(Math.min(this.y, this.yMaxLimit), this.yMinLimit);
+        this.startX = event.touches[i].clientX;
+        this.startY = event.touches[i].clientY;
+      }
     }
   }
 
